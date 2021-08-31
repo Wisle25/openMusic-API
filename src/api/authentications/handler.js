@@ -1,3 +1,4 @@
+const autoBind = require('auto-bind')
 const ClientError = require('../../exceptions/ClientError')
 
 class AuthenticationsHandler {
@@ -7,9 +8,7 @@ class AuthenticationsHandler {
         this._tokenManager = tokenManager
         this._validator = validator
 
-        this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this)
-        this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this)
-        this.delAuthenticationHandler = this.delAuthenticationHandler.bind(this)
+        autoBind(this)
     }
 
     async postAuthenticationHandler (req, h) {

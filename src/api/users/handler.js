@@ -1,3 +1,4 @@
+const autoBind = require('auto-bind')
 const ClientError = require('../../exceptions/ClientError')
 
 class UsersHandler {
@@ -5,7 +6,7 @@ class UsersHandler {
         this._service = service
         this._validator = validator
 
-        this.regUserHandler = this.regUserHandler.bind(this)
+        autoBind(this)
     }
 
     async regUserHandler (req, h) {
