@@ -26,7 +26,7 @@ class PlaylistsService {
         return result.rows[0].id
     }
 
-    async getPlaylists ({ userId }) {
+    async getPlaylists (userId) {
         const query = {
             text: `SELECT playlists.id, playlists.name, users.username FROM playlists
             INNER JOIN users ON playlists.owner = users.id
@@ -38,11 +38,12 @@ class PlaylistsService {
         return result.rows
     }
 
-    async delPlaylist ({ playlistId }) {
+    async delPlaylistById (playlistId) {
         const query = {
             text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
             values: [playlistId]
         }
+
         const result = await this._pool.query(query)
 
         if (!result.rowCount) {
@@ -112,7 +113,7 @@ class PlaylistsService {
 
         const playlist = result.rows[0]
 
-        if (!playlist.owner !== userId) {
+        if (playlist.owner !== userId) {
             throw new AuthorizationError('Woops! Anda bukan owner/collaborator di resource ini')
         }
     }
