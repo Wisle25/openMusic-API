@@ -51,7 +51,7 @@ class UsersService {
         const result = await this._pool.query(query)
 
         if (!result.rowCount) {
-            throw new AuthenticationsError('Username yang anda masukan salah!')
+            throw new AuthenticationsError('Username/password yang anda masukan salah!')
         }
 
         const { id, password: hashedPassword } = result.rows[0]
@@ -59,7 +59,7 @@ class UsersService {
         const match = await bcrypt.compare(password, hashedPassword)
 
         if (!match) {
-            throw new AuthenticationsError('Password yang anda masukan salah!')
+            throw new AuthenticationsError('Username/password yang anda masukan salah!')
         }
 
         return id
