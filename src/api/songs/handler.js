@@ -9,10 +9,10 @@ class SongsHandler {
         autoBind(this)
     }
 
-    async postSongHandler (req, h) {
+    async postSongHandler ({ payload }, h) {
         try {
-            await this._validator.validateSongPayload(req.payload)
-            const songId = await this._service.addSong(req.payload)
+            await this._validator.validateSongPayload(payload)
+            const songId = await this._service.addSong(payload)
 
             const response = h.response({
                 status: 'success',
@@ -43,13 +43,23 @@ class SongsHandler {
         }
     }
 
-    async getSongsHandler () {
-        const songs = await this._service.getSongs()
-        return {
-            status: 'success',
-            data: {
-                songs
+    async getSongsHandler (h) {
+        try {
+            const songs = await this._service.getSongs()
+            return {
+                status: 'success',
+                data: {
+                    songs
+                }
             }
+        } catch (err) {
+            const response = h.response({
+                status: 'error',
+                message: 'Mohon maaf! Terdapat kesalahan pada server kami.'
+            })
+            response.code(500)
+            console.error(err)
+            return response
         }
     }
 
