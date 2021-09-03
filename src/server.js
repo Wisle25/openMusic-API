@@ -2,6 +2,8 @@ require('dotenv').config()
 
 const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
+const Inert = require('@hapi/inert')
+const path = require('path')
 
 // SONGS
 const SongsService = require('./services/postgres/SongsService')
@@ -31,8 +33,13 @@ const CollaborationsValidator = require('./validator/collaborations')
 
 // EXPORTS
 const _exports = require('./api/exports')
-const ProducerService = require('./services/rabbitmq/ProducerService')
+const producerService = require('./services/rabbitmq/ProducerService')
 const ExportsValidator = require('./validator/exports')
+
+// UPLOADS
+const uploads = require('./api/uploads')
+const StorageService = require('./services/storage/StorageService')
+const UploadsValidator = require('./validator/uploads')
 
 // ERROR(S)
 const ClientError = require('./exceptions/ClientError')
@@ -44,6 +51,7 @@ const init = async () => {
     const authenticationsService = new AuthenticationsService()
     const collaborationsService = new CollaborationsService()
     const playlistsService = new PlaylistsService(collaborationsService)
+    const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'))
 
     // Server
     const server = Hapi.server({
@@ -76,6 +84,11 @@ const init = async () => {
                 return h.response(payload).code(401)
             }
 
+            // Files too large
+            if (statusCode === 413) {
+                return h.response(payload).code(413)
+            }
+
             // other errors
             const newResponse = h.response({
                 status: 'error',
@@ -94,6 +107,9 @@ const init = async () => {
     await server.register([
         {
             plugin: Jwt
+        },
+        {
+            plugin: Inert
         }
     ])
 
@@ -157,9 +173,16 @@ const init = async () => {
         {
             plugin: _exports,
             options: {
-                ProducerService,
+                producerService,
                 playlistsService,
                 validator: ExportsValidator
+            }
+        },
+        {
+            plugin: uploads,
+            options: {
+                service: storageService,
+                validator: UploadsValidator
             }
         }
     ])

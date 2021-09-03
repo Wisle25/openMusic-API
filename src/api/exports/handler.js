@@ -2,7 +2,7 @@ const autoBind = require('auto-bind')
 
 class ExportsHandler {
     constructor (producerService, playlistsService, validator) {
-        this._producerService = producerService
+        this._service = producerService
         this._playlistsService = playlistsService
         this._validator = validator
 
@@ -23,7 +23,7 @@ class ExportsHandler {
             targetEmail: req.payload.targetEmail
         }
 
-        await this._producerService.sendMessage('export:playlists', JSON.stringify(message))
+        await this._service.sendMessage('export:playlists', JSON.stringify(message))
 
         const response = h.response({
             status: 'success',
