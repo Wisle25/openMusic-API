@@ -29,6 +29,9 @@ const collaborations = require('./api/collaborations')
 const CollaborationsService = require('./services/postgres/CollaborationsService')
 const CollaborationsValidator = require('./validator/collaborations')
 
+// ERROR(S)
+const ClientError = require('./exceptions/ClientError')
+
 const init = async () => {
     // Reg. Services
     const songsService = new SongsService()
@@ -46,6 +49,40 @@ const init = async () => {
                 origin: ['*']
             }
         }
+    })
+
+    // ERR Life Cycle Handling
+    server.ext('onPreResponse', ({ response }, h) => {
+        // Client Error
+        if (response instanceof ClientError) {
+            const newResponse = h.response({
+                status: 'fail',
+                message: response.message
+            })
+            newResponse.code(response.statusCode)
+            return newResponse
+        }
+
+        // Server error
+        if (response instanceof Error) {
+            // Missing Authorization
+            const { statusCode, payload } = response.output
+            if (statusCode === 401) {
+                return h.response(payload).code(401)
+            }
+
+            // other errors
+            const newResponse = h.response({
+                status: 'error',
+                message: 'Mohon maaf! Terdapat kesalahan pada server kami'
+            })
+            newResponse.code(500)
+            console.error(response)
+            return newResponse
+        }
+
+        // Jika tidak terdapat error sama sekali
+        return response.continue || response
     })
 
     // Reg. Plugin Eksternal

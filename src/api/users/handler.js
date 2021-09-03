@@ -1,5 +1,4 @@
 const autoBind = require('auto-bind')
-const ClientError = require('../../exceptions/ClientError')
 
 class UsersHandler {
     constructor (service, validator) {
@@ -9,40 +8,20 @@ class UsersHandler {
         autoBind(this)
     }
 
-    async regUserHandler (req, h) {
-        try {
-            await this._validator.validateUserPayload(req.payload)
+    async regUserHandler ({ payload }, h) {
+        await this._validator.validateUserPayload(payload)
 
-            const { username, password, fullname } = req.payload
-            const userId = await this._service.addUser({ username, password, fullname })
+        const userId = await this._service.addUser(payload)
 
-            const response = h.response({
-                status: 'success',
-                message: 'User berhasil ditambahkan',
-                data: {
-                    userId
-                }
-            })
-            response.code(201)
-            return response
-        } catch (err) {
-            if (err instanceof ClientError) {
-                const response = h.response({
-                    status: 'fail',
-                    message: err.message
-                })
-                response.code(err.statusCode)
-                return response
+        const response = h.response({
+            status: 'success',
+            message: 'User berhasil ditambahkan',
+            data: {
+                userId
             }
-
-            const response = h.response({
-                status: 'error',
-                message: 'Mohon maaf! Terdapat kesalahan pada server kami.'
-            })
-            response.code(500)
-            console.error(err)
-            return response
-        }
+        })
+        response.code(201)
+        return response
     }
 }
 
