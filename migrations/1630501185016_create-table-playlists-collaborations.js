@@ -21,8 +21,8 @@ exports.up = pgm => {
     // Added Foreign Key to playlistId and userId that references to playlists.id and users.id
     pgm.addConstraint('collaborations', 'fk_collaboration.playlist_id_playlists.id', 'FOREIGN KEY(playlist_id) REFERENCES playlists(id) ON DELETE CASCADE')
     pgm.addConstraint('collaborations', 'fk_collaboration.user_id_users.id', 'FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE')
-};
+}
 
 exports.down = pgm => {
     pgm.dropTable('collaborations')
-};
+}

@@ -6,6 +6,8 @@ exports.up = pgm => {
             notNull: true
         }
     })
-};
+}
 
-exports.down = pgm => {};
+exports.down = pgm => {
+    pgm.dropTable('authentications')
+}

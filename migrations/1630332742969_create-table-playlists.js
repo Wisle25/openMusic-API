@@ -14,8 +14,8 @@ exports.up = pgm => {
             notNull: true
         }
     })
-};
+}
 
 exports.down = pgm => {
     pgm.dropTable('playlists')
-};
+}

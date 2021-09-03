@@ -20,8 +20,8 @@ exports.up = pgm => {
 
     // Foreign Key on song_id
     pgm.addConstraint('playlistsongs', 'fk_playlistsongs.song_id_song.id', 'FOREIGN KEY(song_id) REFERENCES songs(id) ON DELETE CASCADE')
-};
+}
 
 exports.down = pgm => {
     pgm.dropTable('playlistsongs')
-};
+}
