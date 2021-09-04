@@ -19,11 +19,10 @@ class ExportsHandler {
 
         const message = {
             playlistId,
-            userId: credentialId,
             targetEmail: req.payload.targetEmail
         }
 
-        await this._service.sendMessage('export:playlists', JSON.stringify(message))
+        await this._service.sendMessage('export:playlistsongs', JSON.stringify(message))
 
         const response = h.response({
             status: 'success',
